@@ -53,12 +53,12 @@ We're actively adding more capabilities beyond the initial cash flow focus, incl
 
 | Layer | Technology |
 |---|---|
-| Frontend | *(fill in)* |
-| Backend | *(fill in)* |
-| Database | *(fill in)* |
-| AI / Agent layer | Google AI Studio (Gemini), built with Antigravity |
-| Email / Actions | *(fill in)* |
-| Deployment | *(fill in)* |
+| Frontend | 	Next.js (React) + Tailwind CSS |
+| Backend | Next.js API routes |
+| Database | Firebase Firestore |
+| AI / Agent layer | Gemini API |
+| Email / Actions | Resend |
+| Deployment | Vercel |
 
 ## Getting Started
 
@@ -73,3 +73,14 @@ cd opspilot
 # run locally
 # (fill in)
 ```
+
+## Team
+
+| Name | Role |
+|---|---|
+| Ankan Debbarma | Developer |
+| Roshan Kamat | Developer 
+
+## License
+
+MIT
