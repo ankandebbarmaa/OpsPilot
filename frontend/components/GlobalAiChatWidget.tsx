@@ -379,29 +379,16 @@ export const GlobalAiChatWidget: React.FC<GlobalAiChatWidgetProps> = ({
       <div className="fixed bottom-5 right-5 z-40 print:hidden">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="group flex items-center space-x-3 bg-slate-900 hover:bg-slate-800 text-white pl-2.5 pr-4 py-2.5 rounded-full shadow-xl hover:shadow-2xl hover:shadow-indigo-500/20 border border-slate-700/80 transition-all duration-200 cursor-pointer hover:scale-[1.03] active:scale-[0.98]"
+          className="group flex items-center justify-center w-14 h-14 bg-slate-950 hover:bg-slate-900 text-white rounded-full shadow-xl hover:shadow-2xl hover:shadow-indigo-500/20 border border-slate-800 transition-all duration-200 cursor-pointer hover:scale-[1.05] active:scale-[0.97]"
+          title="Ask OpsPilot AI"
         >
-          <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-xs p-1 shrink-0 border border-slate-200">
-            <OpsPilotLogo size={22} />
-            <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+          <div className="relative flex items-center justify-center w-11 h-11 rounded-full bg-white shadow-xs p-1.5 shrink-0 border border-slate-200">
+            <OpsPilotLogo size={24} />
+            <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 border border-slate-900"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border border-slate-950"></span>
             </span>
           </div>
-
-          <div className="flex flex-col text-left pr-0.5">
-            <span className="font-extrabold text-xs tracking-tight text-white group-hover:text-indigo-200 transition">
-              Ask Copilot AI
-            </span>
-            <span className="text-[10px] text-slate-400 font-medium line-clamp-1 max-w-[130px]">
-              {activeTabTitle}
-            </span>
-          </div>
-
-          <span className="ml-0.5 bg-indigo-500/20 text-indigo-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-indigo-500/30 shrink-0 flex items-center space-x-1">
-            <SectionIcon className="w-3 h-3 text-indigo-300" />
-            <span>{sectionConfig.badge}</span>
-          </span>
         </button>
       </div>
 

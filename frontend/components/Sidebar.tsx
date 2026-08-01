@@ -14,12 +14,13 @@ import {
   Wallet,
   Receipt,
   Building2,
+  Calendar,
 } from 'lucide-react';
 import { formatRupee } from '../types';
 
 interface SidebarProps {
-  activeTab: 'dashboard' | 'transactions' | 'invoices' | 'expenses' | 'forecast' | 'templates' | 'playground' | 'logs';
-  setActiveTab: (tab: 'dashboard' | 'transactions' | 'invoices' | 'expenses' | 'forecast' | 'templates' | 'playground' | 'logs') => void;
+  activeTab: 'dashboard' | 'briefing' | 'transactions' | 'invoices' | 'expenses' | 'forecast' | 'templates' | 'playground' | 'logs';
+  setActiveTab: (tab: 'dashboard' | 'briefing' | 'transactions' | 'invoices' | 'expenses' | 'forecast' | 'templates' | 'playground' | 'logs') => void;
   overdueCount: number;
   anomalyCount: number;
   daysUntilShortfall: number;
@@ -47,7 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setMobileOpen,
 }) => {
   interface NavItem {
-    id: 'dashboard' | 'transactions' | 'invoices' | 'expenses' | 'forecast' | 'templates' | 'playground' | 'logs';
+    id: 'dashboard' | 'briefing' | 'transactions' | 'invoices' | 'expenses' | 'forecast' | 'templates' | 'playground' | 'logs';
     label: string;
     icon: React.ElementType;
     badge?: number;
@@ -56,6 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Overview & Assistant', icon: LayoutDashboard },
+    { id: 'briefing', label: 'Daily Briefing', icon: Calendar },
     { id: 'transactions', label: 'Income & Expenses', icon: Receipt },
     { id: 'invoices', label: 'Client Invoices', icon: FileText, badge: overdueCount, badgeColor: 'bg-rose-100 text-rose-800' },
     { id: 'expenses', label: 'Expense Audit', icon: AlertCircle, badge: anomalyCount, badgeColor: 'bg-amber-100 text-amber-800' },
@@ -79,9 +81,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <div className="flex items-center space-x-2">
           <button
-            onClick={onRefreshBriefing}
+            onClick={() => {
+              setActiveTab('briefing');
+              onRefreshBriefing();
+            }}
             disabled={isRefreshing}
-            className="p-2 bg-slate-100 text-slate-800 hover:bg-slate-200 rounded-lg text-xs font-semibold flex items-center cursor-pointer disabled:opacity-50"
+            className="p-2 bg-slate-100 text-slate-850 hover:bg-slate-200 rounded-lg text-xs font-semibold flex items-center cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
@@ -214,7 +219,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Sidebar Footer */}
           <div className="p-3 border-t border-slate-100 space-y-2">
             <button
-              onClick={onRefreshBriefing}
+              onClick={() => {
+                setActiveTab('briefing');
+                onRefreshBriefing();
+              }}
               disabled={isRefreshing}
               className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
             >

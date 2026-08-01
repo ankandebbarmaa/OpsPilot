@@ -10,6 +10,7 @@ import { DeveloperPlayground } from './components/DeveloperPlayground';
 import { ActivityLogView } from './components/ActivityLogView';
 import { CompanySetupModal } from './components/CompanySetupModal';
 import { GlobalAiChatWidget } from './components/GlobalAiChatWidget';
+import { MorningBriefing } from './components/MorningBriefing';
 
 import {
   INITIAL_INVOICES,
@@ -23,7 +24,7 @@ import { Invoice, Expense, CashForecast, ReminderTemplate, ActivityLog, LedgerTr
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'transactions' | 'invoices' | 'expenses' | 'forecast' | 'templates' | 'playground' | 'logs'
+    'dashboard' | 'briefing' | 'transactions' | 'invoices' | 'expenses' | 'forecast' | 'templates' | 'playground' | 'logs'
   >('dashboard');
 
   const [companyName, setCompanyName] = useState<string>('Acme Digital Solutions Pvt Ltd');
@@ -318,6 +319,22 @@ export default function App() {
             onSendReminder={(inv) => handleSendReminder(inv)}
             onVerifyExpense={handleVerifyExpense}
             onDisputeExpense={handleDisputeExpense}
+          />
+        )}
+
+        {activeTab === 'briefing' && (
+          <MorningBriefing
+            invoices={invoices}
+            expenses={expenses}
+            cashForecast={cashForecast}
+            reminderTemplates={reminderTemplates}
+            briefingMarkdown={briefingMarkdown}
+            isRefreshing={isRefreshing}
+            onRefreshBriefing={fetchAiBriefing}
+            onSendReminder={handleSendReminder}
+            onVerifyExpense={handleVerifyExpense}
+            onDisputeExpense={handleDisputeExpense}
+            onNavigateTab={(tab) => setActiveTab(tab)}
           />
         )}
 
