@@ -118,12 +118,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className="font-bold text-base tracking-tight text-slate-900">
                     OpsPilot
                   </span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                    FINANCE
-                  </span>
                 </div>
                 <p className="text-[11px] text-slate-500 font-normal">
-                  Simple Business Money Management
+                  AI Business Money Management
                 </p>
               </div>
             </div>
