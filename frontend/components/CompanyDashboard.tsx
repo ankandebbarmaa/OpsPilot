@@ -82,6 +82,65 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
   const [isAskingAi, setIsAskingAi] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
+  // AI Recommendations State
+  const [recommendationText, setRecommendationText] = useState<string | null>(null);
+  const [activeInsightTab, setActiveInsightTab] = useState<'summary' | 'spend' | 'cashflow' | 'money-flow' | null>(null);
+  const [isGeneratingInsight, setIsGeneratingInsight] = useState(false);
+  const [copiedRecommendation, setCopiedRecommendation] = useState(false);
+
+  const handleFetchRecommendation = async (type: 'summary' | 'spend' | 'cashflow' | 'money-flow') => {
+    if (isGeneratingInsight) return;
+    setActiveInsightTab(type);
+    setIsGeneratingInsight(true);
+    setRecommendationText(null);
+    setCopiedRecommendation(false);
+
+    let promptText = '';
+    if (type === 'summary') {
+      promptText = 'Provide a comprehensive, high-level operations briefing. Break down our general bank balance health, outstanding invoices, recent outflows, and the single most urgent action item we need to take today. Keep the response concise, punchy, and formatted in clean markdown.';
+    } else if (type === 'spend') {
+      promptText = 'Audit our monthly expenses and anomalous charges. Review the flagged anomalies, identify categories with excessive or unnecessary spending, compare normal average baseline spend vs current spend, and suggest exactly where we can cut costs. Keep it concise, actionable, and formatted in clean markdown.';
+    } else if (type === 'cashflow') {
+      promptText = 'Analyze our cashflow health, runway length, and target cash safety buffer. Evaluate how many days we have until a predicted cash shortfall, identify which upcoming invoices or bill payments will affect this most, and recommend actions to improve cashflow. Keep it concise, actionable, and formatted in clean markdown.';
+    } else if (type === 'money-flow') {
+      promptText = 'Provide a detailed cash inflow and outflow analysis. Summarize total income recorded, total outflow/expenses, net cash flow, average client payment times, and a breakdown of major cash withdrawals or vendor outflows. Highlight any areas where liquidity can be optimized. Keep it concise and formatted in clean markdown.';
+    }
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: promptText,
+          activeSection: 'AI Recommendations & Audit Insights',
+          invoices,
+          expenses,
+          cashForecast,
+          transactions,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success && data.reply) {
+        setRecommendationText(data.reply);
+      } else {
+        setRecommendationText('Failed to compile recommendations. Please verify the Gemini API key or try again.');
+      }
+    } catch (err) {
+      console.error('Error fetching recommendations:', err);
+      setRecommendationText('An error occurred while compiling AI insights. Please check connection and try again.');
+    } finally {
+      setIsGeneratingInsight(false);
+    }
+  };
+
+  const handleCopyRecommendation = () => {
+    if (!recommendationText) return;
+    navigator.clipboard.writeText(recommendationText);
+    setCopiedRecommendation(true);
+    setTimeout(() => setCopiedRecommendation(false), 2000);
+  };
+
   const quickPrompts = [
     'How much money did we make after expenses this month?',
     'Who owes us money and how many days overdue are they?',
@@ -434,6 +493,134 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* AI Recommendations & Operations Insights Card */}
+      <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5">
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center space-x-1.5">
+              <Sparkles className="w-4.5 h-4.5 text-indigo-600 animate-pulse" />
+              <span>AI Operations & Cashflow Recommendations</span>
+            </h3>
+            <p className="text-xs text-slate-500 font-normal">
+              One-click analytical audit of wasteful spending, cashflow runways, and money ledger patterns.
+            </p>
+          </div>
+        </div>
+
+        {/* Buttons Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <button
+            onClick={() => handleFetchRecommendation('summary')}
+            disabled={isGeneratingInsight}
+            className={`py-3 px-4 rounded-2xl border text-[11px] font-extrabold transition flex items-center justify-center space-x-2 cursor-pointer shadow-3xs disabled:opacity-50 ${
+              activeInsightTab === 'summary'
+                ? 'bg-slate-900 text-white border-slate-900'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 shrink-0" />
+            <span>Executive Summary</span>
+          </button>
+
+          <button
+            onClick={() => handleFetchRecommendation('spend')}
+            disabled={isGeneratingInsight}
+            className={`py-3 px-4 rounded-2xl border text-[11px] font-extrabold transition flex items-center justify-center space-x-2 cursor-pointer shadow-3xs disabled:opacity-50 ${
+              activeInsightTab === 'spend'
+                ? 'bg-slate-900 text-white border-slate-900'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+            }`}
+          >
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span>Audit Spend</span>
+          </button>
+
+          <button
+            onClick={() => handleFetchRecommendation('cashflow')}
+            disabled={isGeneratingInsight}
+            className={`py-3 px-4 rounded-2xl border text-[11px] font-extrabold transition flex items-center justify-center space-x-2 cursor-pointer shadow-3xs disabled:opacity-50 ${
+              activeInsightTab === 'cashflow'
+                ? 'bg-slate-900 text-white border-slate-900'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+            }`}
+          >
+            <TrendingUp className="w-4 h-4 shrink-0" />
+            <span>Analyze Runway</span>
+          </button>
+
+          <button
+            onClick={() => handleFetchRecommendation('money-flow')}
+            disabled={isGeneratingInsight}
+            className={`py-3 px-4 rounded-2xl border text-[11px] font-extrabold transition flex items-center justify-center space-x-2 cursor-pointer shadow-3xs disabled:opacity-50 ${
+              activeInsightTab === 'money-flow'
+                ? 'bg-slate-900 text-white border-slate-900'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+            }`}
+          >
+            <DollarSign className="w-4 h-4 shrink-0" />
+            <span>Money In / Out</span>
+          </button>
+        </div>
+
+        {/* Content Display Area */}
+        <div className="min-h-[140px] transition-all duration-300">
+          {/* Default State */}
+          {!activeInsightTab && !isGeneratingInsight && (
+            <div className="bg-indigo-50/40 border border-indigo-100/60 rounded-2xl p-6 text-center space-y-2">
+              <div className="w-10 h-10 bg-indigo-100/80 rounded-full flex items-center justify-center mx-auto mb-2 text-indigo-600">
+                <Sparkles className="w-5 h-5 animate-pulse" />
+              </div>
+              <h4 className="text-xs font-bold text-slate-800">Select any operation module to compile insights</h4>
+              <p className="text-[11px] text-slate-500 max-w-md mx-auto">
+                OpsPilot AI will analyze your bank ledger, uncollected bills, and upcoming expenses to compile focused summaries in real-time.
+              </p>
+            </div>
+          )}
+
+          {/* Loading state */}
+          {isGeneratingInsight && (
+            <div className="bg-slate-50/40 border border-slate-200/60 rounded-2xl p-6 space-y-4">
+              <div className="flex items-center space-x-2 text-xs font-bold text-indigo-600 animate-pulse">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                <span>
+                  {activeInsightTab === 'summary' && 'Compiling Executive Summary...'}
+                  {activeInsightTab === 'spend' && 'Auditing unnecessary spend spikes...'}
+                  {activeInsightTab === 'cashflow' && 'Calculating cash runway and safety buffer drops...'}
+                  {activeInsightTab === 'money-flow' && 'Analyzing cash inflows, vendor payments, and withdrawals...'}
+                </span>
+              </div>
+              <div className="space-y-2.5 animate-pulse">
+                <div className="h-2.5 bg-slate-200 rounded-full w-full"></div>
+                <div className="h-2.5 bg-slate-200 rounded-full w-11/12"></div>
+                <div className="h-2.5 bg-slate-200 rounded-full w-4/5"></div>
+              </div>
+            </div>
+          )}
+
+          {/* Result State */}
+          {recommendationText && !isGeneratingInsight && (
+            <div className="bg-slate-50/40 border border-slate-200/60 rounded-2xl p-5 px-6 leading-relaxed text-[13px] text-slate-800 space-y-3 relative group">
+              <div className="markdown-body font-normal space-y-2">
+                <Markdown>{recommendationText}</Markdown>
+              </div>
+
+              {/* Copy button */}
+              <button
+                onClick={handleCopyRecommendation}
+                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-2 text-slate-400 hover:text-slate-850 bg-slate-100 hover:bg-slate-200 rounded-xl transition cursor-pointer"
+                title="Copy recommendations"
+              >
+                {copiedRecommendation ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
