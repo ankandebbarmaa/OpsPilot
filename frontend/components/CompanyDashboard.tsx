@@ -495,72 +495,72 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
           </div>
         </div>
       </div>
-
-      {/* AI Recommendations & Operations Insights Card */}
       <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900 flex items-center space-x-1.5">
-              <Sparkles className="w-4.5 h-4.5 text-indigo-600 animate-pulse" />
-              <span>AI Operations & Cashflow Recommendations</span>
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center p-0.5 border border-slate-800 shadow-sm shrink-0">
+            <OpsPilotLogo size={22} />
+          </div>
+          <div>
+            <h3 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+              AI Operations Insights
             </h3>
-            <p className="text-xs text-slate-500 font-normal">
-              One-click analytical audit of wasteful spending, cashflow runways, and money ledger patterns.
+            <p className="text-[11px] text-slate-500 font-normal">
+              One-click deep audits & cashflow intelligence recommendations
             </p>
           </div>
         </div>
 
         {/* Buttons Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="flex flex-wrap gap-2.5">
           <button
             onClick={() => handleFetchRecommendation('summary')}
             disabled={isGeneratingInsight}
-            className={`py-3 px-4 rounded-2xl border text-[11px] font-extrabold transition flex items-center justify-center space-x-2 cursor-pointer shadow-3xs disabled:opacity-50 ${
+            className={`py-2 px-3.5 rounded-xl border text-[11px] font-bold transition flex items-center space-x-1.5 cursor-pointer shadow-3xs disabled:opacity-50 hover:shadow-2xs ${
               activeInsightTab === 'summary'
-                ? 'bg-slate-900 text-white border-slate-900'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                ? 'bg-slate-950 text-white border-slate-950 shadow-sm'
+                : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/80'
             }`}
           >
-            <Sparkles className="w-4 h-4 shrink-0" />
+            <Sparkles className={`w-3.5 h-3.5 shrink-0 ${activeInsightTab === 'summary' ? 'text-indigo-400' : 'text-slate-400'}`} />
             <span>Executive Summary</span>
           </button>
 
           <button
             onClick={() => handleFetchRecommendation('spend')}
             disabled={isGeneratingInsight}
-            className={`py-3 px-4 rounded-2xl border text-[11px] font-extrabold transition flex items-center justify-center space-x-2 cursor-pointer shadow-3xs disabled:opacity-50 ${
+            className={`py-2 px-3.5 rounded-xl border text-[11px] font-bold transition flex items-center space-x-1.5 cursor-pointer shadow-3xs disabled:opacity-50 hover:shadow-2xs ${
               activeInsightTab === 'spend'
-                ? 'bg-slate-900 text-white border-slate-900'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                ? 'bg-slate-950 text-white border-slate-950 shadow-sm'
+                : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/80'
             }`}
           >
-            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <ShieldAlert className={`w-3.5 h-3.5 shrink-0 ${activeInsightTab === 'spend' ? 'text-rose-450' : 'text-slate-400'}`} />
             <span>Audit Spend</span>
           </button>
 
           <button
             onClick={() => handleFetchRecommendation('cashflow')}
             disabled={isGeneratingInsight}
-            className={`py-3 px-4 rounded-2xl border text-[11px] font-extrabold transition flex items-center justify-center space-x-2 cursor-pointer shadow-3xs disabled:opacity-50 ${
+            className={`py-2 px-3.5 rounded-xl border text-[11px] font-bold transition flex items-center space-x-1.5 cursor-pointer shadow-3xs disabled:opacity-50 hover:shadow-2xs ${
               activeInsightTab === 'cashflow'
-                ? 'bg-slate-900 text-white border-slate-900'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                ? 'bg-slate-950 text-white border-slate-950 shadow-sm'
+                : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/80'
             }`}
           >
-            <TrendingUp className="w-4 h-4 shrink-0" />
+            <TrendingUp className={`w-3.5 h-3.5 shrink-0 ${activeInsightTab === 'cashflow' ? 'text-emerald-450' : 'text-slate-400'}`} />
             <span>Analyze Runway</span>
           </button>
 
           <button
             onClick={() => handleFetchRecommendation('money-flow')}
             disabled={isGeneratingInsight}
-            className={`py-3 px-4 rounded-2xl border text-[11px] font-extrabold transition flex items-center justify-center space-x-2 cursor-pointer shadow-3xs disabled:opacity-50 ${
+            className={`py-2 px-3.5 rounded-xl border text-[11px] font-bold transition flex items-center space-x-1.5 cursor-pointer shadow-3xs disabled:opacity-50 hover:shadow-2xs ${
               activeInsightTab === 'money-flow'
-                ? 'bg-slate-900 text-white border-slate-900'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                ? 'bg-slate-950 text-white border-slate-950 shadow-sm'
+                : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/80'
             }`}
           >
-            <DollarSign className="w-4 h-4 shrink-0" />
+            <DollarSign className={`w-3.5 h-3.5 shrink-0 ${activeInsightTab === 'money-flow' ? 'text-amber-450' : 'text-slate-400'}`} />
             <span>Money In / Out</span>
           </button>
         </div>
@@ -569,40 +569,52 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
         <div className="min-h-[140px] transition-all duration-300">
           {/* Default State */}
           {!activeInsightTab && !isGeneratingInsight && (
-            <div className="bg-indigo-50/40 border border-indigo-100/60 rounded-2xl p-6 text-center space-y-2">
-              <div className="w-10 h-10 bg-indigo-100/80 rounded-full flex items-center justify-center mx-auto mb-2 text-indigo-600">
-                <Sparkles className="w-5 h-5 animate-pulse" />
+            <div className="bg-slate-50/40 border border-slate-100 rounded-2xl p-6 text-center space-y-3">
+              <div className="relative w-12 h-12 mx-auto">
+                <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-center p-1.5 shadow-sm">
+                  <OpsPilotLogo size={30} />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-indigo-650 border-2 border-white flex items-center justify-center shadow-3xs">
+                  <Sparkles className="w-2.5 h-2.5 text-white animate-pulse" />
+                </div>
               </div>
-              <h4 className="text-xs font-bold text-slate-800">Select any operation module to compile insights</h4>
-              <p className="text-[11px] text-slate-500 max-w-md mx-auto">
-                OpsPilot AI will analyze your bank ledger, uncollected bills, and upcoming expenses to compile focused summaries in real-time.
-              </p>
+              <div className="space-y-1">
+                <h4 className="text-xs font-bold text-slate-800">Ready to audit business finances</h4>
+                <p className="text-[11px] text-slate-505 max-w-sm mx-auto leading-relaxed font-medium">
+                  Select one of the modules above to let OpsPilot AI scan your ledgers and produce targeted recommendations.
+                </p>
+              </div>
             </div>
           )}
 
           {/* Loading state */}
           {isGeneratingInsight && (
-            <div className="bg-slate-50/40 border border-slate-200/60 rounded-2xl p-6 space-y-4">
-              <div className="flex items-center space-x-2 text-xs font-bold text-indigo-600 animate-pulse">
-                <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>
-                  {activeInsightTab === 'summary' && 'Compiling Executive Summary...'}
-                  {activeInsightTab === 'spend' && 'Auditing unnecessary spend spikes...'}
-                  {activeInsightTab === 'cashflow' && 'Calculating cash runway and safety buffer drops...'}
-                  {activeInsightTab === 'money-flow' && 'Analyzing cash inflows, vendor payments, and withdrawals...'}
-                </span>
+            <div className="bg-white border border-slate-100 rounded-2xl p-6 space-y-4 shadow-3xs">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 rounded-full border border-indigo-100 bg-indigo-50 flex items-center justify-center shrink-0">
+                  <RefreshCw className="w-4 h-4 text-indigo-650 animate-spin" />
+                </div>
+                <div className="space-y-0.5">
+                  <div className="text-xs font-bold text-slate-900">
+                    {activeInsightTab === 'summary' && 'Compiling Executive Summary...'}
+                    {activeInsightTab === 'spend' && 'Auditing wasteful spend spikes...'}
+                    {activeInsightTab === 'cashflow' && 'Analyzing cash runway safety...'}
+                    {activeInsightTab === 'money-flow' && 'Auditing ledger inflows/outflows...'}
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-bold tracking-wide uppercase">OpsPilot AI is running data models</div>
+                </div>
               </div>
-              <div className="space-y-2.5 animate-pulse">
-                <div className="h-2.5 bg-slate-200 rounded-full w-full"></div>
-                <div className="h-2.5 bg-slate-200 rounded-full w-11/12"></div>
-                <div className="h-2.5 bg-slate-200 rounded-full w-4/5"></div>
+              <div className="space-y-2.5 animate-pulse mt-2 pt-2 border-t border-slate-50">
+                <div className="h-2 bg-slate-200 rounded-full w-full"></div>
+                <div className="h-2 bg-slate-200 rounded-full w-11/12"></div>
+                <div className="h-2 bg-slate-200 rounded-full w-4/5"></div>
               </div>
             </div>
           )}
 
           {/* Result State */}
           {recommendationText && !isGeneratingInsight && (
-            <div className="bg-slate-50/40 border border-slate-200/60 rounded-2xl p-5 px-6 leading-relaxed text-[13px] text-slate-800 space-y-3 relative group">
+            <div className="bg-slate-50/20 border border-slate-200/80 rounded-2xl p-6 leading-relaxed text-[13px] text-slate-850 space-y-3 relative group shadow-3xs">
               <div className="markdown-body font-normal space-y-2">
                 <Markdown>{recommendationText}</Markdown>
               </div>
@@ -610,7 +622,7 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
               {/* Copy button */}
               <button
                 onClick={handleCopyRecommendation}
-                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-2 text-slate-400 hover:text-slate-850 bg-slate-100 hover:bg-slate-200 rounded-xl transition cursor-pointer"
+                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-2 text-slate-400 hover:text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition cursor-pointer shadow-3xs animate-fade-in"
                 title="Copy recommendations"
               >
                 {copiedRecommendation ? (
