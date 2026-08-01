@@ -1,0 +1,8 @@
+{
+  "name": "Remix OpsPilot: AI Assistant for Cashflow \u0026 Invoices",
+  "description": "An AI operations second brain for small businesses that monitors invoices, expenses, and cash balances to deliver concise daily morning briefings with one-click actions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

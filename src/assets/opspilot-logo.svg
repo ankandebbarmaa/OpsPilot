@@ -1,0 +1,15 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="opspilot-blue" x1="20" y1="20" x2="85" y2="65" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#3B82F6" />
+      <stop offset="50%" stopColor="#2563EB" />
+      <stop offset="100%" stopColor="#1D4ED8" />
+    </linearGradient>
+    <linearGradient id="opspilot-navy" x1="25" y1="70" x2="60" y2="35" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#0B132B" />
+      <stop offset="100%" stopColor="#1E293B" />
+    </linearGradient>
+  </defs>
+  <path d="M 31.5 69 L 43.2 69 L 48.8 55.2 L 54.8 42.2 L 35.2 50.8 L 40.5 53.5 Z" fill="url(#opspilot-navy)" />
+  <path d="M 37.2 37 C 37.2 27.8 46.5 27.8 58.5 27.8 C 70.5 27.8 73 35.5 73 43 C 73 51.5 67.5 57.5 52.2 57.5 L 46 51.2 C 55 51.2 63.8 48 63.8 42.5 C 63.8 36.8 57.5 35.2 49 35.2 L 37.2 35.2 Z" fill="url(#opspilot-blue)" />
+</svg>
