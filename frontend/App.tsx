@@ -40,6 +40,74 @@ export default function App() {
   const [briefingMarkdown, setBriefingMarkdown] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
+  const [isAutopilotEnabled, setIsAutopilotEnabled] = useState<boolean>(false);
+
+  // Autopilot Mode Execution loop (runs background tasks automatically when active)
+  useEffect(() => {
+    if (!isAutopilotEnabled) return;
+
+    const interval = setInterval(() => {
+      // 1. Check for auto-nudge candidates: Overdue unpaid invoices (>5 days overdue) that haven't been nudged today
+      const autoNudgeInvoice = invoices.find(
+        (inv) => inv.status === 'unpaid' && inv.daysOverdue > 5 && !inv.lastReminderSent?.includes('Today')
+      );
+
+      if (autoNudgeInvoice) {
+        setInvoices((prev) =>
+          prev.map((i) =>
+            i.id === autoNudgeInvoice.id
+              ? {
+                  ...i,
+                  lastReminderSent: 'Today, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  reminderCount: i.reminderCount + 1,
+                  autopilotHandled: true,
+                }
+              : i
+          )
+        );
+
+        const newLog: ActivityLog = {
+          id: `log-auto-${Date.now()}`,
+          timestamp: 'Just now',
+          type: 'autopilot_executed' as any,
+          title: 'Autopilot: Payment Nudge Dispatched',
+          description: `Dispatched collections reminder to ${autoNudgeInvoice.clientCompany} for Invoice #${autoNudgeInvoice.invoiceNumber} (${formatRupee(autoNudgeInvoice.amount)}).`,
+          channel: 'nudge' as any,
+          status: 'success',
+        };
+        setActivityLogs((prev) => [newLog, ...prev]);
+        return; // Execute only one action per cycle for visible staggered execution
+      }
+
+      // 2. Check for auto-dispute candidates: Unreviewed flagged expenses (>3.5x average)
+      const autoDisputeExpense = expenses.find(
+        (exp) => exp.status === 'flagged' && !exp.reviewedByOwner && (exp.anomalyMultiplier || 0) > 3.5
+      );
+
+      if (autoDisputeExpense) {
+        setExpenses((prev) =>
+          prev.map((e) =>
+            e.id === autoDisputeExpense.id
+              ? { ...e, status: 'disputed', reviewedByOwner: true, autopilotHandled: true }
+              : e
+          )
+        );
+
+        const newLog: ActivityLog = {
+          id: `log-auto-${Date.now()}`,
+          timestamp: 'Just now',
+          type: 'autopilot_executed' as any,
+          title: 'Autopilot: Double-billing Dispute Filed',
+          description: `Disputed anomalous charge at ${autoDisputeExpense.merchant} (${formatRupee(autoDisputeExpense.amount)}, ${autoDisputeExpense.anomalyMultiplier}x avg) with vendor.`,
+          channel: 'dispute' as any,
+          status: 'success',
+        };
+        setActivityLogs((prev) => [newLog, ...prev]);
+      }
+    }, 6000); // 6-second execution ticks for interactive visual confirmation
+
+    return () => clearInterval(interval);
+  }, [isAutopilotEnabled, invoices, expenses]);
 
   // Fetch AI Morning Briefing on load and on trigger
   const fetchAiBriefing = async () => {
@@ -315,10 +383,13 @@ export default function App() {
             expenses={expenses}
             cashForecast={cashForecast}
             transactions={transactions}
+            activityLogs={activityLogs}
             onNavigateTab={(tab) => setActiveTab(tab)}
             onSendReminder={(inv) => handleSendReminder(inv)}
             onVerifyExpense={handleVerifyExpense}
             onDisputeExpense={handleDisputeExpense}
+            isAutopilotEnabled={isAutopilotEnabled}
+            onToggleAutopilot={() => setIsAutopilotEnabled(!isAutopilotEnabled)}
           />
         )}
 
@@ -353,6 +424,7 @@ export default function App() {
             onSendReminder={handleSendReminder}
             onMarkPaid={handleMarkPaid}
             onAddInvoice={handleAddInvoice}
+            isAutopilotEnabled={isAutopilotEnabled}
           />
         )}
 
@@ -362,6 +434,7 @@ export default function App() {
             onVerifyExpense={handleVerifyExpense}
             onDisputeExpense={handleDisputeExpense}
             onAddExpense={handleAddExpense}
+            isAutopilotEnabled={isAutopilotEnabled}
           />
         )}
 

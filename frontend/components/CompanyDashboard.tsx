@@ -26,17 +26,20 @@ import {
 } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { OpsPilotLogo } from './OpsPilotLogo';
-import { Invoice, Expense, CashForecast, LedgerTransaction, ChatMessage, formatRupee } from '../types';
+import { Invoice, Expense, CashForecast, LedgerTransaction, ChatMessage, formatRupee, ActivityLog } from '../types';
 
 interface CompanyDashboardProps {
   invoices: Invoice[];
   expenses: Expense[];
   cashForecast: CashForecast;
   transactions: LedgerTransaction[];
+  activityLogs: ActivityLog[];
   onNavigateTab: (tab: 'dashboard' | 'transactions' | 'invoices' | 'expenses' | 'forecast' | 'templates' | 'playground' | 'logs') => void;
   onSendReminder: (invoice: Invoice) => void;
   onVerifyExpense: (expenseId: string) => void;
   onDisputeExpense: (expenseId: string) => void;
+  isAutopilotEnabled?: boolean;
+  onToggleAutopilot?: () => void;
 }
 
 export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
@@ -44,10 +47,13 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
   expenses,
   cashForecast,
   transactions,
+  activityLogs = [],
   onNavigateTab,
   onSendReminder,
   onVerifyExpense,
   onDisputeExpense,
+  isAutopilotEnabled = false,
+  onToggleAutopilot,
 }) => {
   // Financial Calculations
   const overdueInvoices = invoices.filter((i) => i.status === 'overdue');
@@ -240,6 +246,81 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
             <span>+ Create Invoice</span>
           </button>
         </div>
+      </div>
+
+      {/* Autopilot Controller Banner */}
+      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-3xs flex flex-col justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start space-x-3 flex-1">
+            <div className={`p-2.5 rounded-xl shrink-0 ${isAutopilotEnabled ? 'bg-indigo-50 text-indigo-600 animate-pulse' : 'bg-slate-200 text-slate-500'}`}>
+              <Cpu className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <h3 className="font-bold text-slate-900 text-sm">
+                  Autopilot Finance Engine
+                </h3>
+                <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${isAutopilotEnabled ? 'bg-emerald-100 text-emerald-800 animate-pulse' : 'bg-slate-200 text-slate-650'}`}>
+                  {isAutopilotEnabled ? 'Active' : 'Offline'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 max-w-2xl leading-normal">
+                {isAutopilotEnabled 
+                  ? "OpsPilot AI is running in autopilot mode. Background agents are monitoring overdue client bills, automatically dispatching reminders, and flagging & filing disputes for suspicious vendor card swipes."
+                  : "Enable Autopilot to let OpsPilot AI automatically follow up on late accounts receivables and dispute double-billed charges in real-time."
+                }
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3 shrink-0 self-end md:self-auto">
+            {isAutopilotEnabled && (
+              <div className="hidden lg:flex items-center space-x-1.5 text-[11px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping" />
+                <span>Scanning ledger activities...</span>
+              </div>
+            )}
+            <button
+              onClick={onToggleAutopilot}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                isAutopilotEnabled ? 'bg-indigo-600' : 'bg-slate-300'
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  isAutopilotEnabled ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Live Autopilot Activity logs list */}
+        {isAutopilotEnabled && activityLogs.filter(log => log.type === ('autopilot_executed' as any)).length > 0 && (
+          <div className="pt-3 border-t border-slate-200/80 space-y-1.5">
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
+              <span className="w-1 h-1 rounded-full bg-indigo-500 animate-ping" />
+              <span>Autopilot Activity Feed</span>
+            </div>
+            <div className="space-y-1.5">
+              {activityLogs
+                .filter(log => log.type === ('autopilot_executed' as any))
+                .slice(0, 3)
+                .map((log) => (
+                  <div key={log.id} className="flex items-center justify-between text-[11px] text-slate-700 bg-white border border-slate-200/60 px-3 py-2 rounded-xl shadow-3xs">
+                    <div className="flex items-center space-x-2 overflow-hidden mr-4">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="font-bold text-slate-900 shrink-0">{log.title}:</span>
+                      <span className="text-slate-500 truncate">{log.description}</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-semibold italic shrink-0">
+                      {log.timestamp}
+                    </span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Primary Financial Overview Grid */}
@@ -679,12 +760,19 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
                   <span className="font-bold text-slate-900 text-sm">
                     {formatRupee(inv.amount)}
                   </span>
-                  <button
-                    onClick={() => onSendReminder(inv)}
-                    className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold text-[11px] transition shadow-2xs cursor-pointer"
-                  >
-                    Send Nudge
-                  </button>
+                  {inv.autopilotHandled ? (
+                    <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg font-bold text-[10px] uppercase flex items-center">
+                      <Check className="w-3 h-3 text-emerald-600 mr-1" />
+                      <span>Auto-Nudged</span>
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => onSendReminder(inv)}
+                      className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold text-[11px] transition shadow-2xs cursor-pointer"
+                    >
+                      Send Nudge
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -714,18 +802,27 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
                   <span className="font-bold text-rose-700 text-sm">
                     {formatRupee(exp.amount)}
                   </span>
-                  <button
-                    onClick={() => onVerifyExpense(exp.id)}
-                    className="px-2.5 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 rounded-lg font-semibold text-[11px] transition cursor-pointer"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => onDisputeExpense(exp.id)}
-                    className="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-semibold text-[11px] transition cursor-pointer"
-                  >
-                    Flag
-                  </button>
+                  {exp.autopilotHandled || exp.status === 'disputed' ? (
+                    <span className="px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg font-bold text-[10px] uppercase flex items-center">
+                      <AlertTriangle className="w-3 h-3 text-rose-650 mr-1" />
+                      <span>Auto-Disputed</span>
+                    </span>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => onVerifyExpense(exp.id)}
+                        className="px-2.5 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 rounded-lg font-semibold text-[11px] transition cursor-pointer"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => onDisputeExpense(exp.id)}
+                        className="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-semibold text-[11px] transition cursor-pointer"
+                      >
+                        Flag
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

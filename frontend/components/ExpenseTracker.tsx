@@ -15,6 +15,7 @@ interface ExpenseTrackerProps {
   onVerifyExpense: (expenseId: string) => void;
   onDisputeExpense: (expenseId: string) => void;
   onAddExpense: (expense: Expense) => void;
+  isAutopilotEnabled?: boolean;
 }
 
 export const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
@@ -22,6 +23,7 @@ export const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
   onVerifyExpense,
   onDisputeExpense,
   onAddExpense,
+  isAutopilotEnabled = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [anomalyFilter, setAnomalyFilter] = useState<'all' | 'anomalies_only' | 'verified'>('all');
@@ -126,6 +128,21 @@ export const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
           <p className="text-[11px] text-slate-400 font-medium">Automatic overcharge alert trigger</p>
         </div>
       </div>
+      {isAutopilotEnabled && (
+        <div className="bg-rose-50/60 border border-rose-200 rounded-2xl p-4 shadow-3xs flex items-center space-x-3.5">
+          <div className="p-2 bg-rose-100/80 text-rose-800 rounded-xl shrink-0 animate-pulse">
+            <AlertCircle className="w-4 h-4 text-rose-600" />
+          </div>
+          <div>
+            <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wide">
+              Autopilot Expense Dispute Active
+            </h4>
+            <p className="text-[11px] text-slate-600 mt-0.5 leading-normal">
+              OpsPilot AI is automatically contesting card swipes that spike above 3.5x baseline averages. Disputes are submitted instantly to vendor billing contacts.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Filter Bar */}
       <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -202,7 +219,7 @@ export const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
                   </td>
 
                   <td className="py-3.5 px-4">
-                    {exp.isAnomaly && exp.status !== 'verified' ? (
+                    {exp.isAnomaly && exp.status !== 'verified' && exp.status !== 'disputed' ? (
                       <div>
                         <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
                           {exp.anomalyMultiplier ? `${exp.anomalyMultiplier}× Spike` : 'Anomaly Flagged'}
@@ -211,7 +228,7 @@ export const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
                       </div>
                     ) : exp.status === 'disputed' ? (
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                        Disputed
+                        {exp.autopilotHandled ? 'Auto-Disputed' : 'Disputed'}
                       </span>
                     ) : (
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center w-fit">
@@ -221,7 +238,13 @@ export const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
                   </td>
 
                   <td className="py-3.5 px-4 text-right space-x-1.5">
-                    {exp.status !== 'verified' && (
+                    {exp.status === 'disputed' && (
+                      <span className="px-2.5 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-[10px] font-bold uppercase inline-flex items-center space-x-1">
+                        <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
+                        <span>{exp.autopilotHandled ? 'Auto-Disputed' : 'Disputed'}</span>
+                      </span>
+                    )}
+                    {exp.status !== 'verified' && exp.status !== 'disputed' && (
                       <button
                         onClick={() => onVerifyExpense(exp.id)}
                         className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[11px] font-bold border border-emerald-200 transition-all cursor-pointer inline-flex items-center space-x-1"
