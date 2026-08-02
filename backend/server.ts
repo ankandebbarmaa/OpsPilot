@@ -64,6 +64,12 @@ async function safeGeminiGenerate(promptText: string): Promise<string | null> {
   return null;
 }
 
+function sanitizeBriefingMarkdown(markdown: string): string {
+  return markdown
+    .replace(/^###\s*[\p{Extended_Pictographic}\uFE0F]+\s*/gmu, '### ')
+    .replace(/\p{Extended_Pictographic}/gu, '');
+}
+
 // System Prompt constant for OpsPilot AI Operations Assistant
 const OPS_PILOT_SYSTEM_PROMPT = `You are OpsPilot, an AI operations assistant for a company's finances.
 Analyze the latest accounting, transaction, and banking data and produce concise advice for the business owner.
@@ -120,7 +126,7 @@ ${unusualExpenses.map((exp: any) => `- ${exp.merchant} (${exp.category}): ₹${(
         ? unusualExpenses.map((e: any) => `  * **${e.merchant}** (${e.category}) charged **₹${(e.amount || 0).toLocaleString('en-IN')}** – **${e.anomalyMultiplier || 3}× normal baseline** (Average: ₹${(e.normalAverage || 0).toLocaleString('en-IN')}). *Action:* Review transaction details.`).join('\n')
         : `  * *No unusual expense anomalies detected.*`;
 
-      aiBriefingText = `### 🌅 OpsPilot Daily Operations Briefing
+      aiBriefingText = `### OpsPilot Daily Operations Briefing
 
 * **Overdue Invoices (${overdueInvoices.length} Action Items)**
 ${overdueItems}
@@ -131,6 +137,8 @@ ${anomalyItems}
 * **Cash Forecast Shortfall Warning**
   * **Projected Cash Crunch in ${daysShort} days**: Current bank balance (₹${currentBal.toLocaleString('en-IN')}) will drop below your ₹${buffer.toLocaleString('en-IN')} safety buffer on ${shortfallDate} unless open invoices (₹${totalOverdue.toLocaleString('en-IN')}) clear or upcoming bill payments are rescheduled. *Action:* Send payment nudges to overdue clients.`;
     }
+
+    aiBriefingText = sanitizeBriefingMarkdown(aiBriefingText);
 
     res.json({
       success: true,
@@ -148,7 +156,7 @@ ${anomalyItems}
 });
 
 // 3. Real AI Chat Endpoint for OpsPilot Financial Assistant
-app.post("/api/chat", async (req, res) => {
+async function handleChatRequest(req: express.Request, res: express.Response) {
   try {
     const { message, activeSection } = req.body;
 
@@ -268,7 +276,10 @@ STRICT RULES:
     console.error("Chat Endpoint Error:", error);
     res.status(500).json({ success: false, error: error.message || "Failed to process chat query" });
   }
-});
+}
+
+app.post("/api/chat", handleChatRequest);
+app.post("/api/ai/chat", handleChatRequest);
 
 // 4. Send Invoice via Resend API Endpoint
 app.post("/api/resend/send", async (req, res) => {

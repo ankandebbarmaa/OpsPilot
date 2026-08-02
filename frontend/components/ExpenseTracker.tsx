@@ -8,6 +8,7 @@ import {
   Search,
   Filter,
   XCircle,
+  FileText,
 } from 'lucide-react';
 
 interface ExpenseTrackerProps {
@@ -86,10 +87,8 @@ export const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="p-1 bg-amber-600 text-white rounded-md font-extrabold text-xs">
-              EXP
-            </span>
-            <span className="text-xs font-semibold text-slate-600">Audit Engine</span>
+            <FileText className="w-4 h-4 text-amber-600" />
+            <span className="text-xs font-semibold text-slate-600">Vendor Audit</span>
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-1 flex items-center">
             Expense Anomalies & Vendor Audit
@@ -130,7 +129,7 @@ export const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
       </div>
       {isAutopilotEnabled && (
         <div className="bg-rose-50/60 border border-rose-200 rounded-2xl p-4 shadow-3xs flex items-center space-x-3.5">
-          <div className="p-2 bg-rose-100/80 text-rose-800 rounded-xl shrink-0 animate-pulse">
+          <div className="p-2 bg-rose-100/80 text-rose-800 rounded-xl shrink-0">
             <AlertCircle className="w-4 h-4 text-rose-600" />
           </div>
           <div>
@@ -228,7 +227,7 @@ export const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
                       </div>
                     ) : exp.status === 'disputed' ? (
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                        {exp.autopilotHandled ? 'Auto-Disputed' : 'Disputed'}
+                        Disputed
                       </span>
                     ) : (
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center w-fit">
@@ -241,7 +240,7 @@ export const ExpenseTracker: React.FC<ExpenseTrackerProps> = ({
                     {exp.status === 'disputed' && (
                       <span className="px-2.5 py-1.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-[10px] font-bold uppercase inline-flex items-center space-x-1">
                         <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
-                        <span>{exp.autopilotHandled ? 'Auto-Disputed' : 'Disputed'}</span>
+                        <span>Disputed</span>
                       </span>
                     )}
                     {exp.status !== 'verified' && exp.status !== 'disputed' && (

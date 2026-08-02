@@ -4,7 +4,6 @@ import {
   MessageSquare,
   X,
   Send,
-  Sparkles,
   Copy,
   Check,
   RefreshCw,
@@ -307,7 +306,7 @@ export const GlobalAiChatWidget: React.FC<GlobalAiChatWidgetProps> = ({
     setIsAskingAi(true);
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -345,14 +344,7 @@ export const GlobalAiChatWidget: React.FC<GlobalAiChatWidgetProps> = ({
       const errorMsg: ChatMessage = {
         id: `err-${Date.now()}`,
         sender: 'assistant',
-        text:
-          'OpsPilot Assistant summary: Current bank balance is ' +
-          formatRupee(cashForecast.currentBalance) +
-          ' with ' +
-          invoices.filter((i) => i.status === 'overdue').length +
-          ' overdue invoices totaling ' +
-          formatRupee(totalAr) +
-          '.',
+        text: `**OpsPilot assistant unavailable right now.**\n\nCurrent bank balance: ${formatRupee(cashForecast.currentBalance)}\n\nOverdue invoices: ${invoices.filter((i) => i.status === 'overdue').length} totaling ${formatRupee(totalAr)}.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setChatSessions((prev) =>
@@ -603,9 +595,9 @@ export const GlobalAiChatWidget: React.FC<GlobalAiChatWidgetProps> = ({
                     <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                       <RefreshCw className="w-4 h-4 animate-spin" />
                     </div>
-                    <div className="bg-white border border-indigo-100 text-indigo-900 rounded-2xl rounded-tl-xs p-3 text-xs font-semibold flex items-center space-x-2 shadow-2xs">
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>OpsPilot AI is analyzing {sectionConfig.badge} ledger...</span>
+                    <div className="bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-xs p-3 text-xs font-semibold flex items-center space-x-2 shadow-2xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0" />
+                      <span>Analyzing {sectionConfig.badge.toLowerCase()} data...</span>
                     </div>
                   </div>
                 )}

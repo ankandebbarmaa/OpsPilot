@@ -208,9 +208,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="p-1 bg-indigo-600 text-white rounded-md font-extrabold text-xs">
-              AR
-            </span>
+            <FileText className="w-4 h-4 text-indigo-600" />
             <span className="text-xs font-semibold text-slate-600">Accounts Receivable</span>
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-1">
@@ -257,7 +255,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
               <div className="bg-white p-3 rounded-lg border border-slate-200">
                 <p className="font-semibold text-slate-900 flex items-center space-x-1">
                   <Mail className="w-3.5 h-3.5 text-indigo-600 mr-1 shrink-0" />
-                  <span>1. Official Email Invoice (Tax Document)</span>
+                  <span>Official Invoice Email</span>
                 </p>
                 <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
                   Dispatches the formal itemized invoice PDF/HTML document directly to the client's inbox via Resend API. Best for initial billing, advance payment requests, and tax accounting.
@@ -266,7 +264,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
               <div className="bg-white p-3 rounded-lg border border-slate-200">
                 <p className="font-semibold text-slate-900 flex items-center space-x-1">
                   <Send className="w-3.5 h-3.5 text-amber-600 mr-1 shrink-0" />
-                  <span>2. Payment Nudge (Automated Reminder)</span>
+                  <span>Payment Nudge</span>
                 </p>
                 <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
                   Sends a lightweight follow-up notification (WhatsApp / SMS / Quick Email) customized for the payment stage (e.g. pre-due reminder or 7-day overdue notice). Logs reminder attempt counts.
@@ -453,13 +451,13 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                         <span>#{inv.invoiceNumber}</span>
                         <span className="block text-[10px] font-semibold text-indigo-600 font-sans">
                           {inv.paymentType === 'advance'
-                            ? '⚡ Advance'
+                            ? 'Advance Deposit'
                             : inv.paymentType === 'final'
-                            ? '🏁 Final'
+                            ? 'Final Settlement'
                             : inv.paymentType === 'milestone'
-                            ? '🎯 Milestone'
+                            ? 'Milestone Payment'
                             : inv.paymentType === 'retainer'
-                            ? '🔄 Retainer'
+                            ? 'Retainer'
                             : 'Full Payment'}
                         </span>
                       </div>
@@ -516,10 +514,11 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                       </div>
                     </td>
 
-                    <td className="py-3.5 px-4 text-right space-x-1.5">
+                    <td className="py-3.5 px-4 text-right align-top">
+                      <div className="flex flex-wrap justify-end gap-1.5 ml-auto max-w-[260px]">
                       <button
                         onClick={() => setPdfModalInvoice(inv)}
-                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-[11px] font-semibold transition cursor-pointer inline-flex items-center space-x-1"
+                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-[10px] font-semibold transition cursor-pointer inline-flex items-center space-x-1"
                         title="Preview & Download PDF Invoice"
                       >
                         <Printer className="w-3 h-3 text-slate-600" />
@@ -532,7 +531,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                           setResendStatusResult(null);
                           setCustomResendNote('');
                         }}
-                        className="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-[11px] font-semibold shadow-2xs transition cursor-pointer inline-flex items-center space-x-1"
+                        className="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-[10px] font-semibold shadow-2xs transition cursor-pointer inline-flex items-center space-x-1"
                         title="Send invoice via Email API"
                       >
                         <Mail className="w-3 h-3" />
@@ -541,29 +540,23 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
 
                       {inv.status !== 'paid' && (
                         <>
-                          {inv.autopilotHandled ? (
-                            <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[10px] font-bold uppercase inline-flex items-center space-x-1">
-                              <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>Auto-Nudged</span>
-                            </span>
-                          ) : (
-                            <button
-                              onClick={() => onSendReminder(inv, tmpl)}
-                              className="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[11px] font-semibold border border-indigo-200 transition cursor-pointer inline-flex items-center space-x-1"
-                            >
-                              <Send className="w-3 h-3" />
-                              <span>Nudge</span>
-                            </button>
-                          )}
+                          <button
+                            onClick={() => onSendReminder(inv, tmpl)}
+                            className="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-semibold border border-indigo-200 transition cursor-pointer inline-flex items-center space-x-1"
+                          >
+                            <Send className="w-3 h-3" />
+                            <span>Nudge</span>
+                          </button>
                           <button
                             onClick={() => onMarkPaid(inv.id)}
-                            className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[11px] font-semibold border border-emerald-200 transition cursor-pointer inline-flex items-center space-x-1"
+                            className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-semibold border border-emerald-200 transition cursor-pointer inline-flex items-center space-x-1"
                           >
                             <CheckCircle2 className="w-3 h-3" />
                             <span>Paid</span>
                           </button>
                         </>
                       )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -749,10 +742,10 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-600"
                 >
                   <option value="full">Standard Full Payment (100%)</option>
-                  <option value="advance">⚡ Advance Deposit (Upfront Payment)</option>
-                  <option value="final">🏁 Final Settlement (Remaining Balance)</option>
-                  <option value="milestone">🎯 Milestone / Deliverable Payment</option>
-                  <option value="retainer">🔄 Monthly Retainer Payment</option>
+                  <option value="advance">Advance Deposit (Upfront Payment)</option>
+                  <option value="final">Final Settlement (Remaining Balance)</option>
+                  <option value="milestone">Milestone / Deliverable Payment</option>
+                  <option value="retainer">Monthly Retainer Payment</option>
                 </select>
               </div>
 

@@ -13,7 +13,7 @@ import {
   Mail,
   RefreshCw,
   TrendingUp,
-  FileText,
+  ChevronRight,
 } from 'lucide-react';
 
 interface MorningBriefingProps {
@@ -84,7 +84,7 @@ export const MorningBriefing: React.FC<MorningBriefingProps> = ({
       )}
 
       {/* Hero Light Banner */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs relative overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div className="space-y-1.5">
             <div className="flex items-center space-x-2">
@@ -118,7 +118,7 @@ export const MorningBriefing: React.FC<MorningBriefingProps> = ({
         </div>
 
         {/* Quick Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-5 border-t border-slate-200">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5 pt-4 border-t border-slate-200">
           <div className="bg-slate-50/50 rounded-xl p-3.5 flex items-center space-x-3 border border-slate-200/80">
             <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 font-bold">
               <Clock className="w-5 h-5" />
@@ -158,7 +158,7 @@ export const MorningBriefing: React.FC<MorningBriefingProps> = ({
       </div>
 
       {/* AI Synthesized Executive Summary Card - Light */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-2xs space-y-3">
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
@@ -169,28 +169,28 @@ export const MorningBriefing: React.FC<MorningBriefingProps> = ({
           <span className="text-[11px] text-slate-400 font-semibold">Live Analysis</span>
         </div>
 
-        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4 text-xs sm:text-sm text-slate-800 leading-relaxed font-sans">
+        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 text-[12px] sm:text-[13px] text-slate-800 leading-6 font-sans">
           {briefingMarkdown ? (
-            <div className="whitespace-pre-wrap font-sans space-y-1">
+            <div className="whitespace-pre-wrap font-sans space-y-1.25 max-w-4xl mx-auto">
               <Markdown
                 components={{
                   h3: ({ children }) => (
-                    <h3 className="text-xs font-bold text-slate-900 mt-4 mb-2 first:mt-0 uppercase tracking-wider flex items-center">
-                      <span className="w-1.5 h-1.5 bg-indigo-500 rounded-xs mr-2" />
+                    <h3 className="text-[11px] font-bold text-slate-900 mt-3.5 mb-2 first:mt-0 uppercase tracking-wider flex items-center">
+                      <ChevronRight className="w-3 h-3 text-slate-400 mr-1" />
                       {children}
                     </h3>
                   ),
                   ul: ({ children }) => (
-                    <ul className="space-y-1.5 my-2 pl-1 list-none">{children}</ul>
+                    <ul className="space-y-1.25 my-2 pl-0 list-none">{children}</ul>
                   ),
                   li: ({ children }) => (
-                    <li className="text-xs text-slate-700 flex items-start space-x-2 leading-relaxed">
-                      <span className="text-indigo-400 mt-1 shrink-0 text-[10px]">•</span>
+                    <li className="text-[12px] text-slate-700 flex items-start space-x-2 leading-relaxed">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-2 shrink-0" />
                       <span>{children}</span>
                     </li>
                   ),
                   p: ({ children }) => (
-                    <p className="text-xs text-slate-650 leading-relaxed my-1.5">{children}</p>
+                    <p className="text-[12px] text-slate-600 leading-relaxed my-1">{children}</p>
                   ),
                   strong: ({ children }) => (
                     <strong className="font-semibold text-slate-900">{children}</strong>
@@ -204,7 +204,7 @@ export const MorningBriefing: React.FC<MorningBriefingProps> = ({
               </Markdown>
             </div>
           ) : (
-            <p className="text-slate-500 italic">Preparing simple operations briefing...</p>
+            <p className="text-slate-500 italic text-[12px]">Preparing simple operations briefing...</p>
           )}
         </div>
       </div>

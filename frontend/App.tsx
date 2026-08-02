@@ -49,7 +49,7 @@ export default function App() {
     const interval = setInterval(() => {
       // 1. Check for auto-nudge candidates: Overdue unpaid invoices (>5 days overdue) that haven't been nudged today
       const autoNudgeInvoice = invoices.find(
-        (inv) => inv.status === 'unpaid' && inv.daysOverdue > 5 && !inv.lastReminderSent?.includes('Today')
+        (inv) => inv.status === 'overdue' && inv.daysOverdue > 5 && !inv.lastReminderSent?.includes('Today')
       );
 
       if (autoNudgeInvoice) {
@@ -383,13 +383,10 @@ export default function App() {
             expenses={expenses}
             cashForecast={cashForecast}
             transactions={transactions}
-            activityLogs={activityLogs}
             onNavigateTab={(tab) => setActiveTab(tab)}
             onSendReminder={(inv) => handleSendReminder(inv)}
             onVerifyExpense={handleVerifyExpense}
             onDisputeExpense={handleDisputeExpense}
-            isAutopilotEnabled={isAutopilotEnabled}
-            onToggleAutopilot={() => setIsAutopilotEnabled(!isAutopilotEnabled)}
           />
         )}
 
