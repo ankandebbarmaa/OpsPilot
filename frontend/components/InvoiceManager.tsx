@@ -241,32 +241,32 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
 
       {/* Nudge vs Email Guide Banner */}
       {showNudgeInfo && (
-        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-4 shadow-sm border border-indigo-800/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-3xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1.5 text-xs flex-1">
             <div className="flex items-center space-x-2">
-              <span className="px-2 py-0.5 bg-indigo-500 text-white font-extrabold text-[10px] rounded uppercase tracking-wider">
+              <span className="px-2 py-0.5 bg-indigo-600 text-white font-bold text-[10px] rounded uppercase tracking-wider">
                 Workflow Guide
               </span>
-              <h3 className="font-extrabold text-white text-sm">
+              <h3 className="font-bold text-slate-900 text-sm">
                 Understanding "Email" vs "Nudge" in OpsPilot
               </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-              <div className="bg-white/10 p-3 rounded-xl border border-white/10">
-                <p className="font-bold text-white flex items-center space-x-1">
-                  <Mail className="w-3.5 h-3.5 text-indigo-300 mr-1 shrink-0" />
+              <div className="bg-white p-3 rounded-lg border border-slate-200">
+                <p className="font-semibold text-slate-900 flex items-center space-x-1">
+                  <Mail className="w-3.5 h-3.5 text-indigo-600 mr-1 shrink-0" />
                   <span>1. Official Email Invoice (Tax Document)</span>
                 </p>
-                <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
                   Dispatches the formal itemized invoice PDF/HTML document directly to the client's inbox via Resend API. Best for initial billing, advance payment requests, and tax accounting.
                 </p>
               </div>
-              <div className="bg-white/10 p-3 rounded-xl border border-white/10">
-                <p className="font-bold text-white flex items-center space-x-1">
-                  <Send className="w-3.5 h-3.5 text-amber-300 mr-1 shrink-0" />
+              <div className="bg-white p-3 rounded-lg border border-slate-200">
+                <p className="font-semibold text-slate-900 flex items-center space-x-1">
+                  <Send className="w-3.5 h-3.5 text-amber-600 mr-1 shrink-0" />
                   <span>2. Payment Nudge (Automated Reminder)</span>
                 </p>
-                <p className="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
                   Sends a lightweight follow-up notification (WhatsApp / SMS / Quick Email) customized for the payment stage (e.g. pre-due reminder or 7-day overdue notice). Logs reminder attempt counts.
                 </p>
               </div>
@@ -274,7 +274,7 @@ export const InvoiceManager: React.FC<InvoiceManagerProps> = ({
           </div>
           <button
             onClick={() => setShowNudgeInfo(false)}
-            className="text-slate-400 hover:text-white text-xs font-bold shrink-0 self-start sm:self-center p-1 cursor-pointer"
+            className="text-slate-400 hover:text-slate-700 text-xs font-bold shrink-0 self-start sm:self-center p-1 cursor-pointer"
           >
             ✕
           </button>

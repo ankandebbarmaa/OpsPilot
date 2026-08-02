@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Markdown from 'react-markdown';
 import { OpsPilotLogo } from './OpsPilotLogo';
 import { Invoice, Expense, CashForecast, ReminderTemplate, formatRupee } from '../types';
 import {
@@ -83,23 +84,23 @@ export const MorningBriefing: React.FC<MorningBriefingProps> = ({
       )}
 
       {/* Hero Light Banner */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-md relative overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
           <div className="space-y-1.5">
             <div className="flex items-center space-x-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 text-white border border-white/20 flex items-center space-x-1">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-50 text-slate-700 border border-slate-200 flex items-center space-x-1">
                 <OpsPilotLogo size={16} />
                 <span>Daily Summary</span>
               </span>
-              <span className="text-xs text-slate-300 flex items-center font-normal">
+              <span className="text-xs text-slate-500 flex items-center font-normal">
                 <Calendar className="w-3.5 h-3.5 mr-1 text-slate-400" />
                 {new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              OpsPilot Daily Briefing: <span className="text-emerald-400">{overdueInvoices.length + flaggedExpenses.length} Action Items</span>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              OpsPilot Daily Briefing: <span className="text-indigo-600">{overdueInvoices.length + flaggedExpenses.length} Action Items</span>
             </h1>
-            <p className="text-slate-300 text-xs sm:text-sm max-w-2xl font-normal">
+            <p className="text-slate-500 text-xs sm:text-sm max-w-2xl font-normal">
               Easy financial summary synthesizing overdue client payments, expense alerts, and bank balance trajectory.
             </p>
           </div>
@@ -108,47 +109,47 @@ export const MorningBriefing: React.FC<MorningBriefingProps> = ({
             <button
               onClick={onRefreshBriefing}
               disabled={isRefreshing}
-              className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-900 rounded-xl text-xs font-semibold flex items-center space-x-2 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+              className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold flex items-center space-x-2 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-indigo-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>{isRefreshing ? 'Analyzing...' : 'Refresh Briefing'}</span>
             </button>
           </div>
         </div>
 
         {/* Quick Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-5 border-t border-slate-800">
-          <div className="bg-white/10 rounded-xl p-3.5 flex items-center space-x-3 border border-white/10">
-            <div className="w-9 h-9 rounded-lg bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0 font-bold">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-5 border-t border-slate-200">
+          <div className="bg-slate-50/50 rounded-xl p-3.5 flex items-center space-x-3 border border-slate-200/80">
+            <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/60 flex items-center justify-center shrink-0 font-bold">
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[11px] text-slate-300 font-normal">Overdue Uncollected Payments</p>
-              <p className="text-base font-semibold text-white">
+              <p className="text-[11px] text-slate-500 font-semibold">Overdue Uncollected Payments</p>
+              <p className="text-base font-bold text-slate-900">
                 {overdueInvoices.length} Invoices ({formatRupee(overdueInvoices.reduce((acc, i) => acc + i.amount, 0))})
               </p>
             </div>
           </div>
 
-          <div className="bg-white/10 rounded-xl p-3.5 flex items-center space-x-3 border border-white/10">
-            <div className="w-9 h-9 rounded-lg bg-rose-400/20 text-rose-300 flex items-center justify-center shrink-0">
+          <div className="bg-slate-50/50 rounded-xl p-3.5 flex items-center space-x-3 border border-slate-200/80">
+            <div className="w-9 h-9 rounded-lg bg-rose-50 text-rose-600 border border-rose-200/60 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[11px] text-slate-300 font-normal">Unusual Expense Spikes</p>
-              <p className="text-base font-semibold text-white">
+              <p className="text-[11px] text-slate-500 font-semibold">Unusual Expense Spikes</p>
+              <p className="text-base font-bold text-slate-900">
                 {flaggedExpenses.length} Flagged Item
               </p>
             </div>
           </div>
 
-          <div className="bg-white/10 rounded-xl p-3.5 flex items-center space-x-3 border border-white/10">
-            <div className="w-9 h-9 rounded-lg bg-sky-400/20 text-sky-300 flex items-center justify-center shrink-0">
+          <div className="bg-slate-50/50 rounded-xl p-3.5 flex items-center space-x-3 border border-slate-200/80">
+            <div className="w-9 h-9 rounded-lg bg-sky-50 text-sky-600 border border-sky-200/60 flex items-center justify-center shrink-0">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[11px] text-slate-300 font-normal">Cash Buffer Alert</p>
-              <p className="text-base font-semibold text-white">
+              <p className="text-[11px] text-slate-500 font-semibold">Cash Buffer Alert</p>
+              <p className="text-base font-bold text-slate-900">
                 Shortfall in {cashForecast.daysUntilShortfall} Days
               </p>
             </div>
@@ -171,18 +172,36 @@ export const MorningBriefing: React.FC<MorningBriefingProps> = ({
         <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4 text-xs sm:text-sm text-slate-800 leading-relaxed font-sans">
           {briefingMarkdown ? (
             <div className="whitespace-pre-wrap font-sans space-y-1">
-              {briefingMarkdown.split('\n').map((line, idx) => {
-                if (line.startsWith('### ')) {
-                  return <h3 key={idx} className="text-base font-semibold text-slate-900 mt-2 mb-1">{line.replace('### ', '')}</h3>;
-                }
-                if (line.startsWith('* **') || line.startsWith('- **')) {
-                  return <div key={idx} className="font-semibold text-slate-900 mt-2">{line}</div>;
-                }
-                if (line.startsWith('  * ') || line.startsWith('  - ')) {
-                  return <div key={idx} className="ml-4 text-slate-700 my-0.5">{line}</div>;
-                }
-                return <p key={idx} className="my-0.5">{line}</p>;
-              })}
+              <Markdown
+                components={{
+                  h3: ({ children }) => (
+                    <h3 className="text-xs font-bold text-slate-900 mt-4 mb-2 first:mt-0 uppercase tracking-wider flex items-center">
+                      <span className="w-1.5 h-1.5 bg-indigo-500 rounded-xs mr-2" />
+                      {children}
+                    </h3>
+                  ),
+                  ul: ({ children }) => (
+                    <ul className="space-y-1.5 my-2 pl-1 list-none">{children}</ul>
+                  ),
+                  li: ({ children }) => (
+                    <li className="text-xs text-slate-700 flex items-start space-x-2 leading-relaxed">
+                      <span className="text-indigo-400 mt-1 shrink-0 text-[10px]">•</span>
+                      <span>{children}</span>
+                    </li>
+                  ),
+                  p: ({ children }) => (
+                    <p className="text-xs text-slate-650 leading-relaxed my-1.5">{children}</p>
+                  ),
+                  strong: ({ children }) => (
+                    <strong className="font-semibold text-slate-900">{children}</strong>
+                  ),
+                  em: ({ children }) => (
+                    <em className="italic text-slate-600 font-medium">{children}</em>
+                  ),
+                }}
+              >
+                {briefingMarkdown}
+              </Markdown>
             </div>
           ) : (
             <p className="text-slate-500 italic">Preparing simple operations briefing...</p>
