@@ -56,7 +56,7 @@ We're actively adding more capabilities beyond the initial cash flow focus, incl
 | Frontend | 	Next.js (React) + Tailwind CSS |
 | Backend | Next.js API routes |
 | Database | Firebase Firestore |
-| AI / Agent layer | Gemini API |
+| AI / Agent layer | Openrouter API |
 | Email / Actions | Resend |
 | Deployment | Vercel |
 
