@@ -1,0 +1,8 @@
+{
+  "firestore": [
+    {
+      "database": "db-fresh-start-999",
+      "rules": "firestore.rules"
+    }
+  ]
+}

@@ -31,36 +31,123 @@ function getGeminiClient(): GoogleGenAI {
   return aiClient;
 }
 
-// Helper to execute Gemini generation with model failover and quota-safe handling
+// Helper to execute LLM generation using the best available API key
 async function safeGeminiGenerate(promptText: string): Promise<string | null> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === "placeholder-key") {
-    return null;
+  // 1. Try OpenAI if key is present
+  const openaiKey = process.env.OPENAI_API_KEY;
+  if (openaiKey && openaiKey.startsWith("sk-")) {
+    try {
+      console.log("[OpsPilot AI] Attempting generation with OpenAI (gpt-4o)...");
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${openaiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [{ role: "user", content: promptText }]
+        })
+      });
+      const data: any = await response.json();
+      if (data.choices?.[0]?.message?.content) {
+        console.log("[OpsPilot AI] OpenAI generation succeeded!");
+        return data.choices[0].message.content;
+      }
+      console.warn("[OpsPilot AI] OpenAI error:", data);
+    } catch (err: any) {
+      console.warn("[OpsPilot AI] OpenAI failed:", err?.message || err);
+    }
   }
 
-  const ai = getGeminiClient();
-  const modelsToTry = ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.1-flash-lite"];
-
-  for (const modelName of modelsToTry) {
+  // 2. Try Anthropic if key is present
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  if (anthropicKey && anthropicKey.startsWith("sk-ant-")) {
     try {
-      const response = await ai.models.generateContent({
-        model: modelName,
-        contents: promptText,
+      console.log("[OpsPilot AI] Attempting generation with Anthropic (claude-3-5-sonnet)...");
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": anthropicKey,
+          "anthropic-version": "2023-06-01"
+        },
+        body: JSON.stringify({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 4096,
+          messages: [{ role: "user", content: promptText }]
+        })
       });
-      if (response.text) {
-        return response.text;
+      const data: any = await response.json();
+      if (data.content?.[0]?.text) {
+        console.log("[OpsPilot AI] Anthropic generation succeeded!");
+        return data.content[0].text;
       }
+      console.warn("[OpsPilot AI] Anthropic error:", data);
     } catch (err: any) {
-      const errMsg = err?.message || String(err);
-      if (errMsg.includes("429") || errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("Quota exceeded")) {
-        console.warn(`[OpsPilot AI] Gemini model ${modelName} quota/rate limit reached. Attempting fallback...`);
-      } else {
-        console.warn(`[OpsPilot AI] Model ${modelName} notice:`, errMsg);
+      console.warn("[OpsPilot AI] Anthropic failed:", err?.message || err);
+    }
+  }
+
+  // 3. Try OpenRouter if key is present
+  const openrouterKey = process.env.OPENROUTER_API_KEY;
+  if (openrouterKey) {
+    try {
+      console.log("[OpsPilot AI] Attempting generation with OpenRouter (openrouter/free)...");
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${openrouterKey}`,
+          "HTTP-Referer": "http://localhost:3000",
+          "X-Title": "OpsPilot"
+        },
+        body: JSON.stringify({
+          model: "openrouter/free",
+          messages: [{ role: "user", content: promptText }]
+        })
+      });
+      const data: any = await response.json();
+      if (data.choices?.[0]?.message?.content) {
+        console.log("[OpsPilot AI] OpenRouter generation succeeded!");
+        return data.choices[0].message.content;
+      }
+      console.warn("[OpsPilot AI] OpenRouter error:", data);
+    } catch (err: any) {
+      console.warn("[OpsPilot AI] OpenRouter failed:", err?.message || err);
+    }
+  }
+
+  // 4. Fallback to Gemini API Key
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (geminiKey && geminiKey !== "placeholder-key") {
+    const ai = getGeminiClient();
+    const modelsToTry = [
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-1.5-flash",
+      "gemini-2.0-flash-lite",
+      "gemini-3.5-flash",
+      "gemini-flash-latest"
+    ];
+
+    for (const modelName of modelsToTry) {
+      try {
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents: promptText,
+        });
+        if (response.text) {
+          return response.text;
+        }
+      } catch (err: any) {
+        const errMsg = err?.message || String(err);
+        console.warn(`[OpsPilot AI] Model ${modelName} failed with error:`, errMsg);
       }
     }
   }
 
-  console.warn("[OpsPilot AI] All Gemini models quota limited or unavailable. Switched seamlessly to OpsPilot Local Intelligence Engine.");
+  console.warn("[OpsPilot AI] No AI providers succeeded. Switched seamlessly to OpsPilot Local Intelligence Engine.");
   return null;
 }
 
@@ -229,40 +316,46 @@ STRICT RULES:
 
     if (!reply) {
       const query = message.toLowerCase();
+      let errorReason = "No active API keys configured.";
+      if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.startsWith("sk-")) {
+        errorReason = "Your OpenAI API Key was used, but it returned a credit balance exhausted error (insufficient_quota). Please add credits to your OpenAI account.";
+      } else if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== "placeholder-key") {
+        errorReason = "Your Gemini API Key was used, but Google returned a quota limit of 0 (RESOURCE_EXHAUSTED). Make sure billing is enabled or create a key in a personal workspace.";
+      }
+      const warningNote = `> ⚠️ **OpsPilot Offline Fallback**: ${errorReason}\n\n`;
+
       if (query.includes("comprehensive, high-level operations briefing") || query.includes("executive")) {
-        reply = `**Executive Operations Summary:**\n\n` +
-          `* **Bank Balance:** **₹1,85,000** (Safe, but ₹15,000 below your ₹2,00,000 target safety buffer)\n` +
-          `* **Receivables (AR):** **₹2,89,000** (3 overdue client payments pending)\n` +
-          `* **Monthly Expense Burn:** **₹3,72,500** (Elevated by recent operational anomalies)\n\n` +
-          `*Recommendation:* Follow up with **Apex Logistics** on invoice #INV-101 (₹84,000, 30 days overdue) immediately to recover buffer.`;
+        reply = warningNote + `**Executive Operations Summary:**\n\n` +
+          `* **Bank Balance:** **₹${(cashForecast?.currentBalance || 0).toLocaleString('en-IN')}** (Safety buffer: ₹${(cashForecast?.cashBufferTarget || 200000).toLocaleString('en-IN')})\n` +
+          `* **Receivables (AR):** **₹${totalAr.toLocaleString('en-IN')}** (${overdueInvoices.length} overdue client payments pending)\n` +
+          `* **Monthly Expense Burn:** **₹${totalExpenses.toLocaleString('en-IN')}**\n\n` +
+          (overdueInvoices.length > 0 ? `*Recommendation:* Follow up with overdue clients immediately to recover cash buffer.` : `*Recommendation:* Reserves are currently healthy.`);
       } else if (query.includes("audit our monthly expenses") || query.includes("wasteful") || query.includes("anomalous charges")) {
-        reply = `**Expense Audit & Cost Optimization:**\n\n` +
-          `We identified **2 anomalous charges** that exceed baseline operational averages:\n\n` +
-          `* **Office Supplies Inc.**: **₹48,000** (4.0x baseline spike). *Reason:* Double billing detected for corporate seating.\n` +
-          `* **Global Freight Express**: **₹98,000** (4.08x baseline spike). *Reason:* Expedited shipping surcharge.\n\n` +
-          `*Action:* Dispute the **Office Supplies Inc.** charge, and audit courier shipping methods to enforce economy freight.`;
+        reply = warningNote + `**Expense Audit & Cost Optimization:**\n\n` +
+          `We identified **${flaggedExpenses.length} anomalous charges** that exceed baseline operational averages:\n\n` +
+          (flaggedExpenses.length > 0 ? flaggedExpenses.map(e => `* **${e.merchant}** (${e.category}): **₹${e.amount.toLocaleString('en-IN')}** (${e.anomalyMultiplier}x baseline spike)`).join('\n') : '*No anomalies flagged.*');
       } else if (query.includes("runway length, and target") || query.includes("runway")) {
-        reply = `**Cashflow Health & Runway Projection:**\n\n` +
-          `* **Current Runway:** **11 Days** remaining before cash balance drops below the ₹2,00,000 buffer threshold.\n` +
-          `* **Projected Shortfall Date:** **August 12, 2026** (assuming no client invoice collection).\n\n` +
-          `*Action:* Collections of open invoices total **₹2,89,000**. Collection of even one invoice (e.g. ACME Corp for ₹50,000) will extend runway by **30+ days**.`;
+        reply = warningNote + `**Cashflow Health & Runway Projection:**\n\n` +
+          `* **Current Runway:** **${cashForecast?.daysUntilShortfall || 0} Days** remaining before cash balance drops below safety buffer.\n` +
+          `* **Projected Shortfall Date:** **${cashForecast?.predictedShortfallDate || 'N/A'}**.\n\n` +
+          `*Action:* Collections of open invoices total **₹${totalAr.toLocaleString('en-IN')}** to extend runway.`;
       } else if (query.includes("detailed cash inflow and outflow") || query.includes("money-flow") || query.includes("money in / out")) {
-        reply = `**Inflow & Outflow Ledger Analysis:**\n\n` +
-          `* **Total Income (Inflow):** **₹1,67,000** (Average client payment period is 18 days).\n` +
-          `* **Total Outflow (Outflow):** **₹3,72,500** (Comprising vendor payments and operational burn).\n` +
-          `* **Net Flow:** **-₹2,05,500** (Deficit is temporary and will resolve as pending invoices settle).\n\n` +
-          `*Action:* Negotiate payment terms with key logistics vendors to Net-45 to align with your client collections.`;
+        reply = warningNote + `**Inflow & Outflow Ledger Analysis:**\n\n` +
+          `* **Total Income (Inflow):** **₹${totalIncome.toLocaleString('en-IN')}**.\n` +
+          `* **Total Outflow (Outflow):** **₹${totalOutflow.toLocaleString('en-IN')}**.\n` +
+          `* **Net Flow:** **₹${(totalIncome - totalOutflow).toLocaleString('en-IN')}**.\n\n` +
+          `*Action:* Align client collection schedules with key vendor outflows to maintain liquidity.`;
       } else if (query.includes("overdue") || query.includes("invoice") || query.includes("owe") || (activeSection && activeSection.toLowerCase().includes("invoice"))) {
-        reply = `**Overdue Invoices Summary (${activeSection || 'Invoices'}):**\n\nYou currently have **${overdueInvoices.length} overdue invoices** totaling **₹${overdueInvoices.reduce((s: number, i: any) => s + i.amount, 0).toLocaleString('en-IN')}**:\n\n` +
+        reply = warningNote + `**Overdue Invoices Summary (${activeSection || 'Invoices'}):**\n\nYou currently have **${overdueInvoices.length} overdue invoices** totaling **₹${overdueInvoices.reduce((s: number, i: any) => s + i.amount, 0).toLocaleString('en-IN')}**:\n\n` +
           (overdueInvoices.length > 0 ? overdueInvoices.map((i: any) => `* **${i.clientCompany}** (#${i.invoiceNumber}): **₹${i.amount.toLocaleString('en-IN')}** (${i.daysOverdue} days late)`).join('\n') : '*All invoices are up to date!*') +
-          `\n\n*Recommendation:* Use the Client Invoices section to dispatch automated payment reminder emails.`;
+          `\n\n*Recommendation:* Dispatch reminders using the invoices dashboard.`;
       } else if (query.includes("balance") || query.includes("cash") || (activeSection && activeSection.toLowerCase().includes("forecast"))) {
-        reply = `**Company Cash & Runway Snapshot (${activeSection || 'Cash Runway'}):**\n\n* **Current Bank Balance:** ₹${(cashForecast?.currentBalance || 185000).toLocaleString('en-IN')}\n* **Target Safety Buffer:** ₹${(cashForecast?.cashBufferTarget || 200000).toLocaleString('en-IN')}\n* **Runway Alert:** In **${cashForecast?.daysUntilShortfall || 11} days**, projected cash drops below the ₹2,00,000 buffer.\n\n*Action:* Collecting open receivables (₹${totalAr.toLocaleString('en-IN')}) will bring balance safely back above buffer.`;
+        reply = warningNote + `**Company Cash & Runway Snapshot (${activeSection || 'Cash Runway'}):**\n\n* **Current Bank Balance:** ₹${(cashForecast?.currentBalance || 0).toLocaleString('en-IN')}\n* **Target Safety Buffer:** ₹${(cashForecast?.cashBufferTarget || 0).toLocaleString('en-IN')}\n* **Runway Alert:** In **${cashForecast?.daysUntilShortfall || 0} days**, projected cash drops below safety buffer.`;
       } else if (query.includes("expense") || query.includes("anomaly") || query.includes("spend") || (activeSection && activeSection.toLowerCase().includes("expense"))) {
-        reply = `**Expense Analysis (${activeSection || 'Expense Audit'}):**\n\n* **Total Recorded Expenses:** ₹${totalExpenses.toLocaleString('en-IN')}\n* **Flagged Anomaly Spikes:** ${flaggedExpenses.length} charges needing review:\n` +
+        reply = warningNote + `**Expense Analysis (${activeSection || 'Expense Audit'}):**\n\n* **Total Recorded Expenses:** ₹${totalExpenses.toLocaleString('en-IN')}\n* **Flagged Anomaly Spikes:** ${flaggedExpenses.length} charges needing review:\n` +
           (flaggedExpenses.length > 0 ? flaggedExpenses.map((e: any) => `  * **${e.merchant}** (${e.category}): **₹${e.amount.toLocaleString('en-IN')}** (${e.anomalyMultiplier || 4}× normal baseline)`).join('\n') : '  * *No unresolved anomalies flagged.*');
       } else {
-        reply = `Based on your company financial records for **${activeSection || 'General Overview'}**:\n\n* **Bank Reserve:** ₹${(cashForecast?.currentBalance || 185000).toLocaleString('en-IN')}\n* **Outstanding Receivables:** ₹${totalAr.toLocaleString('en-IN')} across ${invoices.length} invoices\n* **Unusual Expenses Flagged:** ${flaggedExpenses.length} items totaling ₹${flaggedExpenses.reduce((s: number, e: any) => s + e.amount, 0).toLocaleString('en-IN')}\n\nFeel free to ask me for specific invoice follow-ups, cash projections, or expense audits!`;
+        reply = warningNote + `Based on your company financial records for **${activeSection || 'General Overview'}**:\n\n* **Bank Reserve:** ₹${(cashForecast?.currentBalance || 0).toLocaleString('en-IN')}\n* **Outstanding Receivables:** ₹${totalAr.toLocaleString('en-IN')} across ${invoices.length} invoices\n* **Unusual Expenses Flagged:** ${flaggedExpenses.length} items totaling ₹${flaggedExpenses.reduce((s: number, e: any) => s + e.amount, 0).toLocaleString('en-IN')}\n\nFeel free to ask me for specific invoice follow-ups, cash projections, or expense audits!`;
       }
     }
 
@@ -290,7 +383,11 @@ app.post("/api/resend/send", async (req, res) => {
       return res.status(400).json({ success: false, error: "Invoice is required" });
     }
 
-    const toEmail = recipientEmail || invoice.clientEmail || 'client@example.com';
+    let toEmail = recipientEmail || invoice.clientEmail || 'client@example.com';
+    if (toEmail !== 'contact.ankandebbarma@gmail.com') {
+      console.log(`[Resend Sandbox] Redirecting recipient from ${toEmail} to account owner contact.ankandebbarma@gmail.com`);
+      toEmail = 'contact.ankandebbarma@gmail.com';
+    }
     const subject = `Invoice #${invoice.invoiceNumber} from OpsPilot Financials – ₹${(invoice.amount || 0).toLocaleString('en-IN')}`;
 
     let resendData = null;
@@ -304,7 +401,8 @@ app.post("/api/resend/send", async (req, res) => {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            from: "OpsPilot Billing <billing@opspilot.app>",
+            from: "OpsPilot Billing <onboarding@resend.dev>",
+            reply_to: "contact.ankandebbarma@gmail.com",
             to: [toEmail],
             subject: subject,
             html: `
@@ -322,6 +420,9 @@ app.post("/api/resend/send", async (req, res) => {
           })
         });
         resendData = await resendRes.json();
+        if (!resendRes.ok) {
+          console.error("Resend API Error Response:", resendData);
+        }
       } catch (e: any) {
         console.error("Resend API dispatch error:", e?.message || e);
       }
