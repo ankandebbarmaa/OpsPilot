@@ -152,7 +152,7 @@ const getSectionConfig = (tabTitle: string) => {
 
   // Default Overview
   return {
-    badge: 'Financial Overview',
+    badge: 'Company Overview',
     icon: ShieldCheck,
     placeholder: 'Ask OpsPilot about cashflow, unpaid bills, or company health...',
     starters: [
@@ -204,7 +204,7 @@ export const GlobalAiChatWidget: React.FC<GlobalAiChatWidgetProps> = ({
   const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => [
     {
       id: 'session-default',
-      title: 'Initial Financial Overview',
+      title: 'Initial Overview',
       date: 'Today, 10:00 AM',
       messages: [getInitialMessage(activeTabTitle, sectionConfig)],
     },
@@ -408,15 +408,9 @@ export const GlobalAiChatWidget: React.FC<GlobalAiChatWidgetProps> = ({
                 <OpsPilotLogo size={24} />
               </div>
               <div>
-                <div className="flex items-center space-x-2">
-                  <h3 className="font-extrabold text-sm text-white tracking-tight">OpsPilot AI</h3>
-                  <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center space-x-1">
-                    <SectionIcon className="w-3 h-3 text-indigo-300" />
-                    <span>{sectionConfig.badge}</span>
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-300 font-normal">
-                  Context Aware • {activeTabTitle} Section
+                <h3 className="font-extrabold text-sm text-white tracking-tight whitespace-nowrap">OpsPilot AI</h3>
+                <p className="text-[10px] text-slate-350 font-normal whitespace-nowrap mt-0.5">
+                  Context: {activeTabTitle}
                 </p>
               </div>
             </div>

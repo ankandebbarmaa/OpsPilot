@@ -215,12 +215,9 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
             <span className="p-1 bg-slate-900 text-white rounded-lg font-bold text-xs tracking-wide">
               OPSPILOT
             </span>
-            <span className="text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">
-              Company Dashboard
-            </span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight mt-1">
-            Financial Overview & Operations
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight mt-1.5">
+            Company Dashboard
           </h1>
           <p className="text-xs text-slate-500 font-normal mt-0.5">
             Real-time bank balance, cash runway, and easy financial assistant
@@ -497,7 +494,7 @@ export const CompanyDashboard: React.FC<CompanyDashboardProps> = ({
       </div>
       <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-5">
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center p-0.5 border border-slate-800 shadow-sm shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center p-1 border border-slate-200 shadow-3xs shrink-0 overflow-hidden">
             <OpsPilotLogo size={22} />
           </div>
           <div>
